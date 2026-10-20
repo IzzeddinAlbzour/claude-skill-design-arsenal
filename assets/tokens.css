@@ -1,0 +1,75 @@
+/* design-arsenal canonical tokens.
+   If the project already defines easing/duration tokens, EXTEND those instead (Emil: never fork a parallel system). */
+
+:root {
+  /* easing (Emil; expo for long page reveals only) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.55, 0.055, 0.675, 0.19); /* only for something leaving for good, short */
+
+  /* durations: repeated UI stays < 300ms */
+  --t-press: 140ms;
+  --t-hover: 180ms;
+  --t-ui: 220ms;      /* menus, popovers, selects */
+  --t-modal: 250ms;
+  --t-drawer: 450ms;  /* enter, with --ease-drawer */
+  --t-drawer-exit: 300ms;
+  /* page-only, once per visit */
+  --t-reveal: 800ms;
+  --t-open: 1200ms;
+
+  --stagger-ui: 50ms;     /* lists, translateY(8px) */
+  --stagger-page: 70ms;   /* section parts, rise 16-24px; max 4 steps */
+}
+
+/* press feedback on every pressable */
+:where(button, [role="button"], a.button, .button) {
+  transition: transform var(--t-press) var(--ease-out), background-color var(--t-hover) ease, color var(--t-hover) ease;
+}
+:where(button, [role="button"], a.button, .button):active { transform: scale(0.97); }
+
+/* popover from its trigger (Base UI exposes --transform-origin); modals stay centred */
+[data-popup] { transform-origin: var(--transform-origin, center); }
+
+@media (prefers-reduced-motion: reduce) {
+  /* fewer and gentler, not zero: keep opacity/colour, drop travel */
+  *, *::before, *::after { scroll-behavior: auto !important; }
+  [data-motion="travel"] { transform: none !important; transition-property: opacity, color, background-color !important; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  [data-material] { backdrop-filter: none !important; background: var(--surface, #fff) !important; }
+}
+
+/* ---- mobile-native baseline ----
+   Next.js App Router layout.tsx:
+   export const viewport = {
+     width: "device-width", initialScale: 1, viewportFit: "cover",
+     interactiveWidget: "resizes-content",
+     themeColor: [{ media: "(prefers-color-scheme: light)", color: "<header bg>" },
+                  { media: "(prefers-color-scheme: dark)", color: "<header bg dark>" }],
+   };
+   Never add user-scalable=no / maximum-scale=1. */
+html {
+  -webkit-tap-highlight-color: transparent; /* only because every tappable has :active above */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+:where(button, a, [role="button"], label, summary) {
+  touch-action: manipulation;
+}
+:where(button, [role="button"]) {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+@media (pointer: coarse) {
+  :where(input, select, textarea) { font-size: max(16px, 1em); } /* stops iOS focus zoom */
+}
+/* fixed bottom UI clears the home indicator */
+.safe-bottom { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+.safe-top { padding-top: env(safe-area-inset-top); }
+/* overlays: no scroll chaining */
+:where([role="dialog"], .drawer, .sheet) { overscroll-behavior: contain; }
+/* heights: app shell 100dvh, hero 100svh; never raw 100vh */
