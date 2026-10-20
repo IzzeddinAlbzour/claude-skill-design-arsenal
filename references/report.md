@@ -19,6 +19,18 @@ Tasks:
 Return ≤350 words: capabilities, verdict, top 8–10 findings (one line each, file:line), report path.
 ```
 
+## Critic subagent (the taste-critique gate; fresh context every round)
+
+```
+You are a design juror who did not build this. Score it; do not fix it.
+Rubric: ~/.claude/skills/design-taste-frontend/references/critique.md §2–4 (weights, caps, write-up shape). Apply every cap.
+Calibration: real Sites of the Day land around 7.5–8.0; an honest 8.5 is rare. First score these anchors blind: <2 reference screenshots from the references-first step>, then <the previous round's screenshots + scores, if any>.
+Screenshots of the work: <paths, every verify width, several scroll depths>. Live URL to interact with: <url>.
+Measured facts (not up for debate): <lint/inspect/probe fail lines, grep hits>.
+Return the ROUND block from critique.md §4: scores, caps applied, and only the top 3 problems, each with the screenshot and position. Do not talk yourself out of a problem you found; if you saw it, it counts.
+```
+Use a frontier model (Opus) for the critic; small judges are erratic. One critic per round, never the builder's context.
+
 Lane → model: impeccable critique/audit **Opus**; taste **Opus**; apple + mobile **Opus**; Emil motion **Sonnet**; break-ui **Sonnet**; digests and searches **Haiku/Sonnet**.
 
 Reminders for each lane's prompt:
@@ -39,12 +51,13 @@ Reminders for each lane's prompt:
 | design-taste | critique.md + inspector | 5.7/10, 8 FAIL home |
 | Emil motion | review-animations | Block |
 | mobile-native + apple | checklist | 9/18 PASS |
+| probe + devices | probe fail lines × verify widths; real-device pass | 0 FAIL at 360–1440; real device: not done |
 | break-ui | worst case | 33 findings (n Broken) |
 
 ## Top fixes (ranked by user impact; mobile weighted up)
 | # | Sev | Where (file:line) | Problem | Fix (exact) | Lanes agreeing |
 
-## Direction recommendation (taste) — only if a redesign is on the table
+## Direction recommendation (taste + rubric scores from router.md) — only if a redesign is on the table
 ## Motion plan (Emil) — keep / fix / add / delete
 ## Mobile checklist — PASS/FAIL table
 ## Not verified

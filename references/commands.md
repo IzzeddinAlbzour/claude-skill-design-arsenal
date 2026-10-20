@@ -42,8 +42,8 @@ node $TASTE/assets.mjs --credits --to public/<site>/found
 ```
 `inspect.mjs` exit codes: 0 no FAIL, 1 FAIL, 2 usage error. Screenshots land in `.taste-skill/inspect/`; open them all. `TASTE_SKILL_HISTORY=<path>` isolates the draw history in tests.
 
-## State probe
-`assets/probe.js` measures UI states (drawer open, cart full) that the inspector can't reach. Paste it as the `function` argument to chrome-devtools `evaluate_script`. It respects pseudo-element hit-area growth and WCAG's inline-link exemption, and treats `inert` regions as correctly unfocusable.
+## Probe
+`assets/probe.js` measures the slop gates the other meters miss, in any UI state (drawer open, cart full) the inspector can't reach. Paste the whole file as the `function` argument to chrome-devtools `evaluate_script` at each verify width (emulate `390x844x2,mobile,touch` for the coarse-pointer target rule). It returns `fail` lines first: purple accent, dark by default, banned fonts (by share of rendered text), unique images deduped by src (with reuse), Arabic tracking/italic, inputs under 16px, small targets (44px coarse, 24px fine; counts pseudo-element hit-area growth, exempts inline links), horizontal overflow, RTL `lang` without `dir`, text under 13px, focusables inside `aria-hidden` (`inert` is correct), dialogs without `aria-modal`. Detail lists follow. Check the maths after editing it: `node assets/probe.test.js`.
 
 ## Gotchas from real runs
 - **Split lint by surface class.** Run `lint.mjs <page files>` (page rules) and `lint.mjs --app <app-screen files>` (designer, cart, checkout, dashboard). A single page-mode run over `src/` reports app-legit borders and shadows as FAILs. Mark a floating bar's single shadow with a `taste-skill-ignore` comment and the reason.
@@ -51,7 +51,7 @@ node $TASTE/assets.mjs --credits --to public/<site>/found
 - **Inspector `eyebrow` catches hero kickers** ("Collection · 2027" above the h1). Move the line under the headline as the supporting sentence.
 - **Inspector `gradient` flags photo scrims too.** Use a flat `bg-black/45` band behind the text area instead.
 - **The probe cannot judge "open" by visibility.** Off-canvas drawers stay in the DOM, translated off-screen. Check the state the app exposes (`inert` removed, `aria-hidden="false"`, or the toggle's `aria-expanded`) before you conclude a drawer opened.
-- **Don't edit regexes with shell `sed`.** The shell layer can eat backslashes (`‍` → `200d`). Use the Edit tool, and never paste literal zero-width characters into source; write escapes. (fallback, or for review agents)
+- **Don't edit regexes with shell `sed`.** The shell layer can eat backslashes (`\u200d` → `200d`). Use the Edit tool, and never paste literal zero-width characters into source; write escapes. (fallback, or for review agents)
 Use chrome-devtools MCP (`emulate` viewport `390x844x2,mobile,touch`, then `take_screenshot`) or claude-in-chrome. Take viewport shots at several scroll offsets; full-page mobile captures shrink to an unreadable strip.
 
 ## Emil skills

@@ -22,6 +22,13 @@
 
   --stagger-ui: 50ms;     /* lists, translateY(8px) */
   --stagger-page: 70ms;   /* section parts, rise 16-24px; max 4 steps */
+
+  /* device: heights and safe areas (devices.md). Gutter is symmetric so padding-inline stays right in RTL. */
+  --h-hero: 100svh;   /* stable full height; never raw 100vh / h-screen */
+  --h-shell: 100dvh;  /* app shells and bottom-pinned UI only */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --gutter: max(16px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
 }
 
 /* press feedback on every pressable */
@@ -34,9 +41,14 @@
 [data-popup] { transform-origin: var(--transform-origin, center); }
 
 @media (prefers-reduced-motion: reduce) {
-  /* fewer and gentler, not zero: keep opacity/colour, drop travel */
-  *, *::before, *::after { scroll-behavior: auto !important; }
-  [data-motion="travel"] { transform: none !important; transition-property: opacity, color, background-color !important; }
+  /* fewer and gentler, not zero. Global for CSS transitions: colour/opacity keep easing, travel/scale become instant.
+     Keyframe and JS motion is NOT covered here: gate it (Tailwind motion-safe:, Motion <MotionConfig reducedMotion="user">,
+     or @media (prefers-reduced-motion: no-preference)) or tag JS-driven transforms data-motion="travel". */
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-property: opacity, color, background-color, border-color, outline-color, fill, stroke !important;
+  }
+  [data-motion="travel"] { transform: none !important; }
 }
 @media (prefers-reduced-transparency: reduce) {
   [data-material] { backdrop-filter: none !important; background: var(--surface, #fff) !important; }
@@ -67,9 +79,11 @@ html {
 @media (pointer: coarse) {
   :where(input, select, textarea) { font-size: max(16px, 1em); } /* stops iOS focus zoom */
 }
-/* fixed bottom UI clears the home indicator */
-.safe-bottom { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
-.safe-top { padding-top: env(safe-area-inset-top); }
+/* fixed bars clear the notch and home indicator; insets don't replace margins, hence max() */
+.safe-bottom { padding-block-end: max(1rem, var(--safe-bottom)); }
+.safe-top { padding-block-start: var(--safe-top); }
+.safe-inline { padding-inline: var(--gutter); }
 /* overlays: no scroll chaining */
 :where([role="dialog"], .drawer, .sheet) { overscroll-behavior: contain; }
-/* heights: app shell 100dvh, hero 100svh; never raw 100vh */
+/* Arabic and other connected scripts: never tracked, never faux-italic (rtl.md) */
+:where(:lang(ar), :lang(fa), :lang(ur)) { letter-spacing: 0 !important; font-style: normal !important; }

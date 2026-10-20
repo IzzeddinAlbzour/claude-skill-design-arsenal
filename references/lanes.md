@@ -33,6 +33,16 @@ MI = model-invocable (Skill tool). R = manual-only: Read `~/.claude/skills/<name
   - inspector before/after as objective proof
   - redesign branch `--out .taste-skill/before|after`
 
+## design-arsenal's own lanes (references loaded only at their step)
+| Lane | File | Load when |
+|---|---|---|
+| Devices: target class, adaptive swaps, verify matrix, engines, known bugs, CWV, done rule | `devices.md` | router step 0; every verify step; Pipeline E; "every device" requests |
+| Libraries: icon, component, font, motion picks and bans; shadcn restyle | `libraries.md` | pipeline B step 4, C steps 2–6, any icon/font/library choice |
+| Arabic/RTL, Palestinian identity, apparel PDP/customizer, RTL failure checklist | `rtl.md` | RTL locale or apparel/print-on-demand product |
+| Reference brands and galleries | `refs.md` | references-first step (L builds, redesigns) |
+| Kill list + sweep | `slop.md` | every gate |
+| State and slop probe | `assets/probe.js` (+ `probe.test.js`) | every gate, at the verify widths |
+
 ## Emil Kowalski skills
 | Skill | MI | Writes? | Use it for | Output |
 |---|---|---|---|---|
@@ -62,3 +72,4 @@ MI = model-invocable (Skill tool). R = manual-only: Read `~/.claude/skills/<name
 - `clone-website`: when the project is a 1:1 clone, aesthetics are pinned; only the correctness, mobile, motion-correctness and robustness lanes apply.
 - `ecc:e2e-testing` / `ecc:browser-qa`: click-through verification after a redesign.
 - `ecc:frontend-a11y`: deeper WCAG work beyond impeccable `audit`.
+- Overlapping ECC design skills (`ecc:frontend-design-direction`, `ecc:taste`, `ecc:design-system`, `ecc:make-interfaces-feel-better`, `ecc:motion-*`): don't run them on a surface this skill directs; they would add a second direction and a second motion rulebook. `ecc:liquid-glass-design` is native-only (`conflicts.md`).
